@@ -15,3 +15,4 @@ startApplication()
     .catch(() => {
         console.error('Failed to start the server')
     })
+
