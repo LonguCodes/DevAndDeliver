@@ -34,18 +34,21 @@ function requestPart(requestPart: 'body' | 'query' | 'params', transform?: (valu
             composableFunction?.chain((fn: Function, ...args: any[]) => {
                 const argsMetadata = Reflect.getMetadata(parameterMetadataKey, object, propertyKey)
                 const request = ZoneContext.get()?.getValue(RouteBindings.Context)
-                if (request)
-                    for (const [key, value] of Object.entries(argsMetadata)) {
-                        const {part, key: partKey, transform, required} = value as RequestMetadata;
-                        let argValue = request[part]
-                        if (partKey)
-                            argValue = argValue[partKey]
-                        if (required && !argValue)
-                            throw new HttpErrors.BadRequest(`${partKey} is required in ${part}`)
-                        if (transform)
-                            argValue = transform(argValue)
-                        args[parseInt(key)] = argValue;
-                    }
+                if (!request)
+                    return args;
+                request.body = request.request.body
+
+                for (const [key, value] of Object.entries(argsMetadata)) {
+                    const {part, key: partKey, transform, required} = value as RequestMetadata;
+                    let argValue = request[part]
+                    if (partKey)
+                        argValue = argValue[partKey]
+                    if (required && !argValue)
+                        throw new HttpErrors.BadRequest(`${partKey} is required in ${part}`)
+                    if (transform)
+                        argValue = transform(argValue)
+                    args[parseInt(key)] = argValue;
+                }
                 return args
             })
         }
@@ -64,7 +67,7 @@ export namespace request {
         export const boolean = requestPart('query', x => x.toLowerCase() === 'true')
         export const object = requestPart('query', x => JSON.parse(x))
     }
-    export const body = (required = true) => requestPart('body')(undefined)
+    export const body = requestPart('body', x => x ?? {})(undefined, false)
 }
 
 

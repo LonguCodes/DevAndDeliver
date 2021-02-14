@@ -1,6 +1,6 @@
 import {BindingKey} from "../context/context";
-import Koa from "koa";
+import {Context} from 'koa'
 
 export namespace RouteBindings{
-    export const Context = new BindingKey<Koa.Context>()
+    export const Context = new BindingKey<Context>()
 }

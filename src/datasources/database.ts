@@ -6,7 +6,7 @@ export async function createDatabaseConnection() {
     const url = GlobalContext.get().getValue(DatasourceBindings.MongoUrl);
     if (!url)
         throw new Error("Database connection can't be established")
-    const client = new MongoClient(url, {useUnifiedTopology: true});
+    const client = new MongoClient(`mongodb://${url}`, {useUnifiedTopology: true});
 
     await client.connect();
     const db = client.db(GlobalContext.get().getValue(DatasourceBindings.MongoDatabaseName));

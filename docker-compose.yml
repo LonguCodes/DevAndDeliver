@@ -1,17 +1,17 @@
 version: "3.3"
 services:
   api:
-    container_name: api
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - published: ${APP_PORT:-3000}
+      - published: ${APP_PORT:-4000}
         target: 3000
     environment:
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-secret}
       DATABASE_URL: ${DATABASE_URL:-database}
       REDIS_URL: ${REDIS_URL:-redis}
+      DEBUG: ${DEBUG:-false}
   database:
     image: mongo
   redis:

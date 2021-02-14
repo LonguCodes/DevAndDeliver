@@ -14,9 +14,9 @@ import {DatasourceBindings} from "./datasources/bindings";
 import {createAxios} from "./datasources/axios";
 import {GlobalContext} from "./core/context/global";
 import {AuthBindings} from "./core/auth/bindings";
-import { replaceEmpty} from "./core/utilities";
+import {replaceEmpty} from "./core/utilities";
 import {createRedisConnection} from "./datasources/redis";
-
+import {CoreBindings} from "./core/bindings";
 
 
 export function createApplication() {
@@ -35,8 +35,11 @@ export function createApplication() {
             ctx.body = JSON.stringify(data);
             ctx.status = 200;
         } catch (e: any) {
-            if (!(e instanceof HttpError))
+            if (!(e instanceof HttpError)) {
+                if (GlobalContext.get().getValue(CoreBindings.Debug))
+                    console.error(e)
                 e = new HttpErrors.InternalError()
+            }
             ctx.body = JSON.stringify({
                 message: e.message,
                 code: e.code,
@@ -64,7 +67,7 @@ export function createApplication() {
 
 export async function startApplication() {
 
-    GlobalContext.get().bind(AuthBindings.Secret,  replaceEmpty(process.env.JWT_SECRET, 'secret') );
+    GlobalContext.get().bind(AuthBindings.Secret, replaceEmpty(process.env.JWT_SECRET, 'secret'));
 
     const app = createApplication();
     await createRedisConnection()

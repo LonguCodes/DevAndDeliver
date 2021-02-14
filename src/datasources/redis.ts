@@ -4,7 +4,7 @@ import redis from 'redis';
 
 export function createRedisConnection() {
     const url = GlobalContext.get().getValue(DatasourceBindings.RedisUrl) as string;
-    const client = redis.createClient(url);
+    const client = redis.createClient(`redis://${url}`);
     GlobalContext.get().bind(DatasourceBindings.Redis, client);
     return client;
 }
